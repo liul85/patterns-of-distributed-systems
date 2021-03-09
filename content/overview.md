@@ -111,8 +111,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/
 
 为了提供持久性的保证，要使用[预写日志（WAL）](https://martinfowler.com/articles/patterns-of-distributed-systems/wal.html)。使用[分段日志（Segmented Log）](https://martinfowler.com/articles/patterns-of-distributed-systems/log-segmentation.html)可以将与写日志分成多个段。这么有助于实现日志的清理，通常这会采用[低水位标记（Low-Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/low-watermark.html)进行处理。通过将预写日志复制到多个服务器上，失效容忍性就得到了保障。在服务器间复制由[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)保障。[Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 用于更新[高水位标记（High Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark.html)，以决定哪些值对客户端可见。所有的请求都严格按照顺序进行处理，这可以通过[单一更新队列（Singular Update Queue）](https://martinfowler.com/articles/patterns-of-distributed-systems/singular-update-queue.html)实现。领导者发送请求给追随者时，使用[单一 Socket 通道（Single Socket Channel）](https://martinfowler.com/articles/patterns-of-distributed-systems/single-socket-channel.html)就可以保证顺序。要在单一 Socket 通道上优化吞吐和延迟，可以使用[请求管道（Request Pipeline）](https://martinfowler.com/articles/patterns-of-distributed-systems/request-pipeline.html)。追随者通过接受来自领导者的[心跳（HeartBeat）](https://martinfowler.com/articles/patterns-of-distributed-systems/heartbeat.html)以确定领导者的可用性。如果领导者因为网络分区的原因，临时在集群中失联，可以使用[世代时钟（Generation Clock）](https://martinfowler.com/articles/patterns-of-distributed-systems/generation.html)检测出来。
 
-![Alt text](../image/patterns-of-distributed-system.svg)
-<img src="../image/patterns-of-distributed-system.svg">
+![分布式系统模式](../image/patterns-of-distributed-system.svg)
 
 这样，以通用的形式理解问题以及其可复用的解决方案，有助于理解整个系统的构造块。
 
