@@ -44,7 +44,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/
 
 #### 模式
 
-[模式](https://martinfowler.com/articles/writingPatterns.html)，这是 Christopher Alexander 引入的一个概念，现在在软件设计社区得到了广泛地接受，用以记录在构建软件系统所用的各种设计构造。模式提供一种“从问题到解决方案”的结构化方式，它可以在许多地方见到，并且得到了证明。一种使用模式的一种的方式是，采用模式序列或模式语言的形式，将多个模式联系在一起，这为实现“整个”或完整的系统提供了指导方向。将分布式系统视为一系列模式是一种有价值的做法，可以获得关于其实现更多的洞见。
+[模式](https://martinfowler.com/articles/writingPatterns.html)，这是 Christopher Alexander 引入的一个概念，现在在软件设计社区得到了广泛地接受，用以记录在构建软件系统所用的各种设计构造。模式提供一种“从问题到解决方案”的结构化方式，它可以在许多地方见到，并且得到了证明。使用模式的一种有意思的方式是，采用模式序列或模式语言的形式，将多个模式联系在一起，这为实现“整个”或完整的系统提供了指导方向。将分布式系统视为一系列模式是一种有价值的做法，可以获得关于其实现更多的洞见。
 
 ## 问题及可复用的解决方案
 
@@ -83,9 +83,9 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/
 
 第二个问题是脑裂。一旦产生脑裂，两组服务器就会独立接受更新，不同的客户端就会读写不同的数据，脑裂即便解决了，这些冲突也不可能自动得到解决。
 
-要解决脑裂问题，必须确保两组失联的服务器不能独立地前进。为了确保这一点，服务器采取的每个动作，只有经过大多数服务器的确认之后，才能认为是成功的。如果服务器无法获得多数确认，就不能提供必要的服务。某些客户端可能无法获得服务，但服务器集群总能保持一致的状态。占多数的服务器的数量称为 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html)。如何确定 Quorum 呢？这取决于集群所容忍的失效数量。如果有一个 5 个节点的集群，法定数量就应该是 3。总的来说，如果想容忍 f 个失效，集群的规模就应该是 2f + 1。
+要解决脑裂问题，必须确保两组失联的服务器不能独立地前进。为了确保这一点，服务器采取的每个动作，只有经过大多数服务器的确认之后，才能认为是成功的。如果服务器无法获得多数确认，就不能提供必要的服务。某些客户端可能无法获得服务，但服务器集群总能保持一致的状态。占多数的服务器的数量称为 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html)。如何确定 Quorum 呢？这取决于集群所容忍的失效数量。如果有一个 5 个节点的集群，Quorum 就应该是 3。总的来说，如果想容忍 f 个失效，集群的规模就应该是 2f + 1。
 
-法定数量保证了我们拥有足够的数据副本，以拯救一些服务器的失效。但这不足以给客户端以强一致性保证。比如，一个客户在 Quorum 上发起了一个写操作，但该操作只在一台服务器上成功了。Quorum 上其它服务器依旧是原有的值。当客户端从这个 Quorum 上读取数据时，如果有最新值的服务器可用，它得到的就可能是最新的值。但是，如果客户端开始读取这个值时，有最新值的服务器不可用，它得到的就可能是一个原有的值了。为了避免这种情况，就需要有人追踪是否 Quorum 对于特定的操作达成了一致，只有那些在所有服务器上都可用的值才会发送给客户端。在这种场景下，会使用[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)。领导者控制和协调在追随者上的复制。由领导者决定什么样的变化对于客户端是可见的。[高水位标记（High Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark.html)用于追踪在 WAL 上的项是否已经成功复制到 Quorum 的追随者上。所有达到高水位标记的条目就会对客户端可见。领导者还会将高水位标记传播给追随者。因此，当领导者出现失效时，某个追随者就会成为新的领导者，所以，从客户端的角度看，是不会出现不一致的。
+Quorum 保证了我们拥有足够的数据副本，以拯救一些服务器的失效。但这不足以给客户端以强一致性保证。比如，一个客户在 Quorum 上发起了一个写操作，但该操作只在一台服务器上成功了。Quorum 上其它服务器依旧是原有的值。当客户端从这个 Quorum 上读取数据时，如果有最新值的服务器可用，它得到的就可能是最新的值。但是，如果客户端开始读取这个值时，有最新值的服务器不可用，它得到的就可能是一个原有的值了。为了避免这种情况，就需要有人追踪是否 Quorum 对于特定的操作达成了一致，只有那些在所有服务器上都可用的值才会发送给客户端。在这种场景下，会使用[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)。领导者控制和协调在追随者上的复制。由领导者决定什么样的变化对于客户端是可见的。[高水位标记（High Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark.html)用于追踪在 WAL 上的项是否已经成功复制到 Quorum 的追随者上。所有达到高水位标记的条目就会对客户端可见。领导者还会将高水位标记传播给追随者。因此，当领导者出现失效时，某个追随者就会成为新的领导者，所以，从客户端的角度看，是不会出现不一致的。
 
 ### 进程暂停
 
@@ -101,7 +101,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/
 
 ## 综合运用——一个分布式系统示例
 
-理解这些模式有什么用呢？接下来，我们就从头构建一个完整的系统，看看这些理解会怎样帮助我们。下面我们以一个共识系统为例。分布式共识，是分布式系统实现的一个特例，它给予了我们强一致性的保证。在常见的企业级系统中，这方面的典型例子是，[Zookeeper](https://zookeeper.apache.org/)、[etcd](https://etcd.io/) 和 [Consul](https://www.consul.io/)。它们实现了诸如 [zab](https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html#sc_atomicBroadcast) 和 [Raft](https://raft.github.io/) 之类的共识算法，提供了复制和强一致性。还有其它一些流行的算法实现共识机制，比如[Paxos](https://en.wikipedia.org/wiki/Paxos_(computer_science))，[Google Chubby](https://research.google/pubs/pub27897/)  把这种算法用在了锁服务、视图戳复制和[虚拟同步（virtual-synchrony）](https://www.cs.cornell.edu/ken/History.pdf)上。简单来说，共识就是指，一组服务器达成就存储数据达成一致，以决定存储哪个数据要存储起来，什么时候数据对于客户端可见。
+理解这些模式有什么用呢？接下来，我们就从头构建一个完整的系统，看看这些理解会怎样帮助我们。下面我们以一个共识系统为例。分布式共识，是分布式系统实现的一个特例，它给予了我们强一致性的保证。在常见的企业级系统中，这方面的典型例子是，[Zookeeper](https://zookeeper.apache.org/)、[etcd](https://etcd.io/) 和 [Consul](https://www.consul.io/)。它们实现了诸如 [zab](https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html#sc_atomicBroadcast) 和 [Raft](https://raft.github.io/) 之类的共识算法，提供了复制和强一致性。还有其它一些流行的算法实现共识机制，比如[Paxos](https://en.wikipedia.org/wiki/Paxos_(computer_science))，[Google Chubby](https://research.google/pubs/pub27897/)  把这种算法用在了锁服务、视图戳复制和[虚拟同步（virtual-synchrony）](https://www.cs.cornell.edu/ken/History.pdf)上。简单来说，共识就是指，一组服务器就存储数据达成一致，以决定哪个数据要存储起来，什么时候数据对于客户端可见。
 
 ### 实现共识的模式序列
 
