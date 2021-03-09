@@ -4,12 +4,12 @@
 **原文**
 https://martinfowler.com/articles/patterns-of-distributed-systems/
 
-分布式系统给软件开发带来了一些特殊的挑战，要求数据有多个副本，且彼此间要保持同步。然而，我们不能保证所有工作节点都能可靠地工作，网络延迟会轻易地就造成不一致。尽管如此，许多组织依然要依赖于一系列核心的分布式软件处理，诸如数据存储、消息通信、系统管理以及计算能力等等。这些系统面临着共同的问题，可以采用类似的方案进行解决。本文将这些方案进行分类，进一步拓展成模式，以此我们获得更好的理解，改善对于分布式系统设计的理解、交流和传授方式。 
+分布式系统给软件开发带来了一些特殊的挑战，要求数据有多个副本，且彼此间要保持同步。然而，我们不能保证所有工作节点都能可靠地工作，网络延迟会轻易地就造成不一致。尽管如此，许多组织依然要依赖于一系列核心的分布式软件处理，诸如数据存储、消息通信、系统管理以及计算能力等等。这些系统面临着共同的问题，可以采用类似的方案进行解决。本文将这些方案进行分类，进一步拓展成模式，以此我们获得更好的理解，改善对于分布式系统设计的理解、交流和传授方式。
 
 **2020.8.2**
 
 > Unmesh Joshi
-> 
+>
 > Unmesh Joshi 是 ThoughtWorks 的总监级咨询师。他是一个软件架构的爱好者，相信在今天理解分布式系统的原则，同过去十年里理解 Web 架构或面向对象编程一样至关重要。
 
 ## 这个系列在讨论什么
@@ -110,6 +110,9 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/
 我们按照下面的方式可以将模式放在一起去实现可复制的 WAL。
 
 为了提供持久性的保证，要使用[预写日志（WAL）](https://martinfowler.com/articles/patterns-of-distributed-systems/wal.html)。使用[分段日志（Segmented Log）](https://martinfowler.com/articles/patterns-of-distributed-systems/log-segmentation.html)可以将与写日志分成多个段。这么有助于实现日志的清理，通常这会采用[低水位标记（Low-Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/low-watermark.html)进行处理。通过将预写日志复制到多个服务器上，失效容忍性就得到了保障。在服务器间复制由[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)保障。[Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 用于更新[高水位标记（High Water Mark）](https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark.html)，以决定哪些值对客户端可见。所有的请求都严格按照顺序进行处理，这可以通过[单一更新队列（Singular Update Queue）](https://martinfowler.com/articles/patterns-of-distributed-systems/singular-update-queue.html)实现。领导者发送请求给追随者时，使用[单一 Socket 通道（Single Socket Channel）](https://martinfowler.com/articles/patterns-of-distributed-systems/single-socket-channel.html)就可以保证顺序。要在单一 Socket 通道上优化吞吐和延迟，可以使用[请求管道（Request Pipeline）](https://martinfowler.com/articles/patterns-of-distributed-systems/request-pipeline.html)。追随者通过接受来自领导者的[心跳（HeartBeat）](https://martinfowler.com/articles/patterns-of-distributed-systems/heartbeat.html)以确定领导者的可用性。如果领导者因为网络分区的原因，临时在集群中失联，可以使用[世代时钟（Generation Clock）](https://martinfowler.com/articles/patterns-of-distributed-systems/generation.html)检测出来。
+
+![Alt text](../image/patterns-of-distributed-system.svg)
+<img src="../image/patterns-of-distributed-system.svg">
 
 这样，以通用的形式理解问题以及其可复用的解决方案，有助于理解整个系统的构造块。
 
