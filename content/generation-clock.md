@@ -60,8 +60,6 @@ leader (class ReplicationModule...)
   }
 ```
 
-This way, it is also persisted in the follower log as part of the replication mechanism of Leader and Followers
-
 按照这种做法，它还会持久化在追随者日志中，作为[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)复制机制的一部分。
 
 如果追随者得到了一个来自已罢免领导的消息，追随者就可以告知其世代过低。追随者会给出一个失败的应答。
@@ -94,6 +92,7 @@ Old leader (class ReplicationModule...)
 
 ![世代时钟1](../image/generation1.png)
 ![世代时钟2](../image/generation2.png)
+<center>图1：世代</center>
 
 ## 示例
 

@@ -17,6 +17,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/consistent-cor
 实现一个三五个节点的小集群，提供线性一致性的保证，同时支持失效容忍[1]。一个单独数据集群可以使用小的一致性集群管理元数据，采用类似于 [Lease](https://martinfowler.com/articles/patterns-of-distributed-systems/time-bound-lease.html) 之类的原语在集群范围内进行决策。这样一来，数据集群就可以增长到很大的规模，但对于某些需要强一致性保证的动作，可以使用比较小的元数据集群。
 
 ![一致性内核](../image/ConsistentCore.png)
+<center>图1：一致性内核</center>
 
 一个典型一致性内核接口应该是下面这个样子：
 
