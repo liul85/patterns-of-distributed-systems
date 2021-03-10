@@ -120,13 +120,13 @@ class TimeoutBasedFailureDetector…
 
 #### 技术考量
 
-采用[单一 Socket 通道（Single Socket Channel）](https://martinfowler.com/articles/patterns-of-distributed-systems/single-socket-channel.html)在服务器间通信时，有一点需要考虑，就是[队首阻塞（head-of-line-blockin）](https://en.wikipedia.org/wiki/Head-of-line_blocking)，这会让心跳消息得不到处理。这样一来，延迟就会非常长，以致于产生虚报，认为发送服务器已经宕机，即便它还在按照固定的间隔发送心跳。使用[请求管道（Request Pipeline）](https://martinfowler.com/articles/patterns-of-distributed-systems/request-pipeline.html)，可以保证服务器在发送心跳之前不必等待之前请求的应答回来。有时，使用[单一更新队列（Singular Update Queue）](https://martinfowler.com/articles/patterns-of-distributed-systems/singular-update-queue.html)，像写磁盘这样的任务，就可能会造成延迟，这可能会延迟定时中断的处理，也会延迟发送心跳。
+采用[单一 Socket 通道（Single Socket Channel）](https://martinfowler.com/articles/patterns-of-distributed-systems/single-socket-channel.html)在服务器间通信时，有一点需要考虑，就是[队首阻塞（head-of-line-blocking）](https://en.wikipedia.org/wiki/Head-of-line_blocking)，这会让心跳消息得不到处理。这样一来，延迟就会非常长，以致于产生虚报，认为发送服务器已经宕机，即便它还在按照固定的间隔发送心跳。使用[请求管道（Request Pipeline）](https://martinfowler.com/articles/patterns-of-distributed-systems/request-pipeline.html)，可以保证服务器在发送心跳之前不必等待之前请求的应答回来。有时，使用[单一更新队列（Singular Update Queue）](https://martinfowler.com/articles/patterns-of-distributed-systems/singular-update-queue.html)，像写磁盘这样的任务，就可能会造成延迟，这可能会延迟定时中断的处理，也会延迟发送心跳。
 
 这个问题可以通过在单独的线程中异步发送心跳来解决。类似于 [consul](https://www.consul.io/) 和 [akka](https://akka.io/) 这样的框架都会异步发送心跳。对于接收者服务器同样也是一个问题。接收服务器也要进行磁盘写，检查心跳只能在写完成后才能检查心跳，这就会造成虚报的失效检测。因此接收服务器可以使用[单一更新队列（Singular Update Queue）](https://martinfowler.com/articles/patterns-of-distributed-systems/singular-update-queue.html)，这样就可以重新设置心跳检查机制，将这些延迟包含其中。[raft](https://raft.github.io/) 的参考实现、[log-cabin](https://github.com/logcabin/logcabin) 就是这么做的。
 
 有时，一些运行时特定事件，比如垃圾收集，会造成[本地停顿](https://issues.apache.org/jira/browse/CASSANDRA-9183)，进而造成心跳处理的延迟。这就需要有一种机制，在可能的本地暂停之后，检查处理是否发生过。一个简单的机制就是，在一段足够长的时间窗口之后，比如 5 秒，检查处理是否发生了。在这种情况下，基于这个时间窗口，没有什么可以标记为失效，就可以推迟到下一个循环了。[Cassandra 的实现](https://issues.apache.org/jira/browse/CASSANDRA-9183)就是这种做法的一个很好的示例。
 
-# 大集群，基于 Gossip 的协议
+### 大集群，基于 Gossip 的协议
 
 前面部分描述的心跳机制，并不能扩展到大规模集群，也就是那种有几百到上千台服务器，横跨广域网的集群。在大规模集群中，有两件事要考虑：
 
