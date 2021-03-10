@@ -9,7 +9,7 @@
 ### 模式
 
 * [一致性内核（Consistent Core）](content/consistent-core.md)
-* 世代时钟（Generation Clock）
+* [世代时钟（Generation Clock）](content/generation-clock.md)
 * Gossip Dissemination
 * 心跳（HeartBeat）
 * 高水位标记（High-Water Mark）
