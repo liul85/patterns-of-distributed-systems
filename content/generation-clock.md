@@ -22,7 +22,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/generation.htm
 
 ```java
 class ReplicationModule…
-this.replicationState = new ReplicationState(config, wal.getLastLogEntryGeneration());
+  this.replicationState = new ReplicationState(config, wal.getLastLogEntryGeneration());
 ```
 
 采用[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)模式，选举新的领导者选举时，服务器对这个世代的值进行递增。
@@ -53,12 +53,16 @@ follower (class ReplicationModule...)
 
 ```java
 leader (class ReplicationModule...)
-Long appendToLocalLog(byte[] data) {
-var logEntryId = wal.getLastLogEntryId() + 1;
-var logEntry = new WALEntry(logEntryId, data, EntryType.DATA, replicationState.getGeneration());
-return wal.writeEntry(logEntry);
-}
+  Long appendToLocalLog(byte[] data) {
+      var logEntryId = wal.getLastLogEntryId() + 1;
+      var logEntry = new WALEntry(logEntryId, data, EntryType.DATA, replicationState.getGeneration());
+      return wal.writeEntry(logEntry);
+  }
 ```
+
+This way, it is also persisted in the follower log as part of the replication mechanism of Leader and Followers
+
+按照这种做法，它还会持久化在追随者日志中，作为[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)复制机制的一部分。
 
 如果追随者得到了一个来自已罢免领导的消息，追随者就可以告知其世代过低。追随者会给出一个失败的应答。
 
@@ -78,6 +82,7 @@ Old leader (class ReplicationModule...)
       stepDownIfHigherGenerationResponse(response);
       return;
   }
+
   private void stepDownIfHigherGenerationResponse(ReplicationResponse replicationResponse) {
       if (replicationResponse.getGeneration() > replicationState.getGeneration()) {
           becomeFollower(-1, replicationResponse.getGeneration());
