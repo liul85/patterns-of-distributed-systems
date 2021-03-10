@@ -8,7 +8,7 @@
 
 ### 模式
 
-* 一致性内核（Consistent Core）
+* [一致性内核（Consistent Core）](content/consistent-core.md)
 * 世代时钟（Generation Clock）
 * Gossip Dissemination
 * 心跳（HeartBeat）

@@ -1,6 +1,7 @@
 # 一致性内核（Consistent Core）
 
 **原文**
+
 https://martinfowler.com/articles/patterns-of-distributed-systems/consistent-core.html
 
 维护一个较小的内核，为大规模数据集群提供更强的一致性，这样，可以在无需实现基于 Quorum 算法的前提下协调服务器行为。
@@ -72,7 +73,7 @@ assertEquals(client1.getValue("/servers"), Arrays.asList(
 
 * 服务器实现转发机制，将所有的客户端请求转发给 领导者。这样就允许客户端连接任意的服务器。同样，如果服务器处于领导者 选举过程中，客户端需要不断重试，直到领导者选举成功，一个合法的领导者获得确认。
 
-类似于 zookeeper 和 etcd 这样的产品都实现了这种方式，它们允许追随者 服务器处理只读请求，以免领导者面对大量客户端的只读请求时出现瓶颈。这就降低了客户端基于请求类型去连接领导者或追随者的复杂性。
+    类似于 zookeeper 和 etcd 这样的产品都实现了这种方式，它们允许追随者 服务器处理只读请求，以免领导者面对大量客户端的只读请求时出现瓶颈。这就降低了客户端基于请求类型去连接领导者或追随者的复杂性。
 
 一个找到领导者的简单机制是，尝试连接每一台服务器，尝试发送一个请求，如果服务器不是领导者，它给出的应答就是一个重定向的应答。
 
@@ -100,9 +101,11 @@ private void establishConnectionToLeader(List<InetAddressAndPort> servers) {
         }
     }
 }
+
 private boolean isLookingForLeader(RequestOrResponse requestOrResponse) {
     return requestOrResponse.getRequestId() == RequestId.LookingForLeader.getId();
 }
+
 private void redirectToLeader(RequestOrResponse response) {
     RedirectToLeaderResponse redirectResponse = deserialize(response);
     newPipelinedConnection(redirectResponse.leaderAddress);
@@ -121,14 +124,14 @@ private boolean isRedirectResponse(RequestOrResponse requestOrResponse) {
 
 ```java
 private RequestOrResponse sendConnectRequest(SingleSocketChannel socketChannel) throws IOException {
-  RequestOrResponse request
-    = new RequestOrResponse(RequestId.ConnectRequest.getId(), "CONNECT", 0);
-  try {
-    return socketChannel.blockingSend(request);
-  } catch (IOException e) {
-    resetConnectionToLeader();
-    throw e;
-  }
+    RequestOrResponse request
+        = new RequestOrResponse(RequestId.ConnectRequest.getId(), "CONNECT", 0);
+    try {
+        return socketChannel.blockingSend(request);
+    } catch (IOException e) {
+        resetConnectionToLeader();
+        throw e;
+    }
 }
 ```
 
