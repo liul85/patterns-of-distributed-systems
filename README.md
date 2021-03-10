@@ -8,23 +8,23 @@
 
 ### 模式
 
-一致性内核（Consistent Core）
-世代时钟（Generation Clock）
-Gossip Dissemination
-心跳（HeartBeat）
-高水位标记（High-Water Mark）
-幂等接收者（Idempotent Receiver）
-领导者和追随者（Leader and Followers）
-租约（Lease）
-低水位标记（Low-Water Mark）
-Quorum
-请求管道（Request Pipeline）
-分段日志（Segmented Log）
-单一 Socket 通道（Single Socket Channel）
-单一更新队列（Singular Update Queue）
-状态监控（State Watch）
-Versioned Values
-预写日志（Write-Ahead Log）
+* 一致性内核（Consistent Core）
+* 世代时钟（Generation Clock）
+* Gossip Dissemination
+* 心跳（HeartBeat）
+* 高水位标记（High-Water Mark）
+* 幂等接收者（Idempotent Receiver）
+* 领导者和追随者（Leader and Followers）
+* 租约（Lease）
+* 低水位标记（Low-Water Mark）
+* Quorum
+* 请求管道（Request Pipeline）
+* 分段日志（Segmented Log）
+* 单一 Socket 通道（Single Socket Channel）
+* 单一更新队列（Singular Update Queue）
+* 状态监控（State Watch）
+* Versioned Values
+* 预写日志（Write-Ahead Log）
 
 ## 术语表
 
@@ -47,6 +47,8 @@ Versioned Values
 | propagate        | 传播           |
 | disconnect       | 失联、断开连接 |
 | Generation Clock | 世代时钟       |
+| group membership | 分组成员       |
+| partitions       | 分区          |
 
 
 

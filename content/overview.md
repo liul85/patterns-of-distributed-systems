@@ -1,6 +1,5 @@
 # 分布式系统模式
 
-
 **原文**
 https://martinfowler.com/articles/patterns-of-distributed-systems/
 
