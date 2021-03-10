@@ -1,4 +1,4 @@
-# 世代时钟
+# 世代时钟（Generation Clock）
 
 **原文**
 
@@ -47,7 +47,7 @@ follower (class ReplicationModule...)
   }
 ```
 
-自此之后，领导者会在它发给追随者的每个请求中都包含这个世代信息。它也包含在发给追随者的每个[心跳（HeartBeat）](https://martinfowler.com/articles/patterns-of-distributed-systems/heartbeat.html)消息里，也包含在复制请求中。
+自此之后，领导者会在它发给追随者的每个请求中都包含这个世代信息。它也包含在发给追随者的每个[心跳（HeartBeat）](heartbeat.md)消息里，也包含在复制请求中。
 
 领导者也会把世代信息持久化到[预写日志（Write-Ahead Log）](https://martinfowler.com/articles/patterns-of-distributed-systems/wal.html)的每一个条目里。
 

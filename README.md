@@ -11,7 +11,7 @@
 * [一致性内核（Consistent Core）](content/consistent-core.md)
 * [世代时钟（Generation Clock）](content/generation-clock.md)
 * Gossip Dissemination
-* 心跳（HeartBeat）
+* [心跳（HeartBeat）](content/generation-clock.md)
 * 高水位标记（High-Water Mark）
 * 幂等接收者（Idempotent Receiver）
 * 领导者和追随者（Leader and Followers）
@@ -49,6 +49,8 @@
 | Generation Clock | 世代时钟       |
 | group membership | 分组成员       |
 | partitions       | 分区          |
+| liveness         | 活性          |
+| round trip       | 往返          |
 
 
 
