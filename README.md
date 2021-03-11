@@ -11,8 +11,8 @@
 * [一致性内核（Consistent Core）](content/consistent-core.md)
 * [世代时钟（Generation Clock）](content/generation-clock.md)
 * Gossip Dissemination
-* [心跳（HeartBeat）](content/generation-clock.md)
-* 高水位标记（High-Water Mark）
+* [心跳（HeartBeat）](content/heartbeat.md)
+* [高水位标记（High-Water Mark）](content/high-water-mark.md)
 * 幂等接收者（Idempotent Receiver）
 * 领导者和追随者（Leader and Followers）
 * 租约（Lease）
