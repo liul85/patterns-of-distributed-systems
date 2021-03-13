@@ -12,7 +12,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/leader-followe
 
 对于一个管理数据的系统而言，为了在系统内实现容错，需要将数据复制到多台服务器上。
 
-有一点也很重要，就是给客户提供一些一致性的保证。当数据在多个服务器上更新时，需要决定何时让客户端看到这些数据。只有写读的 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 是不够的，因为一些失效的场景会导致客户端看到不一致的数据。单个的服务器并不知道 Quorum 上其它服务器的数据状态，只有数据是从多台服务器上读取时，才能解决不一致的问题。在某些情况下，这还不够。发送给客户端的数据需要有更强的保证。
+有一点也很重要，就是给客户提供一些一致性的保证。当数据在多个服务器上更新时，需要决定何时让客户端看到这些数据。只有写读的 [Quorum](quorum.md) 是不够的，因为一些失效的场景会导致客户端看到不一致的数据。单个的服务器并不知道 Quorum 上其它服务器的数据状态，只有数据是从多台服务器上读取时，才能解决不一致的问题。在某些情况下，这还不够。发送给客户端的数据需要有更强的保证。
 
 ## 解决方案
 
@@ -119,7 +119,7 @@ class ReplicationModule…
               wal.getLastLogEntryId());
   }
 ```
-获得多数服务器投票的服务器将转成领导者状态。大多数的确定是根据 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 中所讨论的那样。一旦当选，领导者会持续给所有的追随者发送[心跳（HeartBeat）](heartbeat.md)。如果追随者在特定的时间间隔内没有收到心跳，就会触发新的领导选举。
+获得多数服务器投票的服务器将转成领导者状态。大多数的确定是根据 [Quorum](quorum.md) 中所讨论的那样。一旦当选，领导者会持续给所有的追随者发送[心跳（HeartBeat）](heartbeat.md)。如果追随者在特定的时间间隔内没有收到心跳，就会触发新的领导选举。
 
 # 使用外部[[线性化](https://jepsen.io/consistency/models/linearizable)]的存储进行领导者选举
 

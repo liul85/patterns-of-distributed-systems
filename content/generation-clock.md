@@ -12,7 +12,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/generation.htm
 
 ## 问题
 
-在[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)的构建过程中，有一种可能性，领导者临时同追随者失联了。可能是因为垃圾回收造成而暂停，也可能是临时的网络中断，这些都会让领导者进程与追随者之间失联。在这种情况下，领导者进程依旧在运行，暂停之后或是网络中断停止之后，它还是会尝试发送复制请求给追随者。这么做是有危险的，因为与此同时，集群余下的部分可能已经选出了一个新的领导者，接收来自客户端的请求。有一点非常重要，集群余下的部分要能检测出有的请求是来自原有的领导者。原有的领导者本身也要能检测出，它是临时从集群中断开了，然后，采用必要的修正动作，交出领导权。
+在[领导者和追随者（Leader and Followers）](leader-and-followers.md)的构建过程中，有一种可能性，领导者临时同追随者失联了。可能是因为垃圾回收造成而暂停，也可能是临时的网络中断，这些都会让领导者进程与追随者之间失联。在这种情况下，领导者进程依旧在运行，暂停之后或是网络中断停止之后，它还是会尝试发送复制请求给追随者。这么做是有危险的，因为与此同时，集群余下的部分可能已经选出了一个新的领导者，接收来自客户端的请求。有一点非常重要，集群余下的部分要能检测出有的请求是来自原有的领导者。原有的领导者本身也要能检测出，它是临时从集群中断开了，然后，采用必要的修正动作，交出领导权。
 
 ## 解决方案
 
@@ -25,7 +25,7 @@ class ReplicationModule…
   this.replicationState = new ReplicationState(config, wal.getLastLogEntryGeneration());
 ```
 
-采用[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)模式，选举新的领导者选举时，服务器对这个世代的值进行递增。
+采用[领导者和追随者（Leader and Followers）](leader-and-followers.md)模式，选举新的领导者选举时，服务器对这个世代的值进行递增。
 
 ```java
 class ReplicationModule…
@@ -60,7 +60,7 @@ leader (class ReplicationModule...)
   }
 ```
 
-按照这种做法，它还会持久化在追随者日志中，作为[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)复制机制的一部分。
+按照这种做法，它还会持久化在追随者日志中，作为[领导者和追随者（Leader and Followers）](leader-and-followers.md)复制机制的一部分。
 
 如果追随者得到了一个来自已罢免领导的消息，追随者就可以告知其世代过低。追随者会给出一个失败的应答。
 

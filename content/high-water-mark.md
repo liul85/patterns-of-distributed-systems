@@ -12,7 +12,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark
 
 ## 问题
 
-[预写日志（Write-Ahead Log）](https://martinfowler.com/articles/patterns-of-distributed-systems/wal.html)模式用于在服务器奔溃重启之后恢复状态。但在服务器失效的情况下，想要保障可用性，仅有预写日志是不够的。如果单个服务器失效了，只有等到服务器重启之后，客户端才能够继续使用其功能。为了得到一个更可用的系统，我们需要将日志复制到多台服务器上。使用[领导者和追随者（Leader and Followers）](https://martinfowler.com/articles/patterns-of-distributed-systems/leader-follower.html)时，领导者会将所有的日志条目都复制到追随者的 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 上。如果领导者失效了，集群会选出一个新的领导者，客户端在大部分情况下还是能像从前一样继续在集群中工作。但是，还有几件事可能会有问题：
+[预写日志（Write-Ahead Log）](https://martinfowler.com/articles/patterns-of-distributed-systems/wal.html)模式用于在服务器奔溃重启之后恢复状态。但在服务器失效的情况下，想要保障可用性，仅有预写日志是不够的。如果单个服务器失效了，只有等到服务器重启之后，客户端才能够继续使用其功能。为了得到一个更可用的系统，我们需要将日志复制到多台服务器上。使用[领导者和追随者（Leader and Followers）](leader-and-followers.md)时，领导者会将所有的日志条目都复制到追随者的 [Quorum](quorum.md) 上。如果领导者失效了，集群会选出一个新的领导者，客户端在大部分情况下还是能像从前一样继续在集群中工作。但是，还有几件事可能会有问题：
 
 * 在向任意的追随者发送日志条目之前，领导者失效了。
 * 给一部分追随者发送日志条目之后，领导者失效了，日志条目没有发送给大部分的追随者。
@@ -21,7 +21,7 @@ https://martinfowler.com/articles/patterns-of-distributed-systems/high-watermark
 
 ## 解决方案
 
-高水位标记就是一个日志文件中的索引，记录了在追随者的 [Quorum](https://martinfowler.com/articles/patterns-of-distributed-systems/quorum.html) 中都成功复制的最后一个日志条目。在复制期间，领导者也会把高水位标记传给追随者。对于集群中的所有服务器而言，只有反映的更新小于高水位标记的数据才能传输给客户端。
+高水位标记就是一个日志文件中的索引，记录了在追随者的 [Quorum](quorum.md) 中都成功复制的最后一个日志条目。在复制期间，领导者也会把高水位标记传给追随者。对于集群中的所有服务器而言，只有反映的更新小于高水位标记的数据才能传输给客户端。
 
 下面是这个操作的序列图。
 
